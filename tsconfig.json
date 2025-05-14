@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES6", // Can stay ES6 for output compatibility
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "lib": [
+      "ES2017",
+      "DOM"
+    ] // Add ES2017 for Object.entries, DOM for browser APIs
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
