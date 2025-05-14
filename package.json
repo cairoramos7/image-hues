@@ -1,6 +1,6 @@
 {
   "name": "@cairoramos7/image-hues",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Extract dominant colors and contrast colors from images",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,9 +32,11 @@
     "LICENSE"
   ],
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "jest": "^29.0.0",
-    "@types/jest": "^29.0.0",
-    "ts-jest": "^29.0.0"
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "jest-canvas-mock": "^2.5.2",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.3.2",
+    "typescript": "^5.0.0"
   }
 }
