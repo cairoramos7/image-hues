@@ -2,6 +2,8 @@
 
 Thank you for contributing to Image Hues! Please follow these guidelines:
 
+**Note**: This package was previously published as `@cairoramos7/image-hues`. It is now available as `image-hues` on npm.
+
 ## How to Contribute
 1. Fork the repository: [https://github.com/cairoramos7/image-hues](https://github.com/cairoramos7/image-hues).
 2. Create a feature branch: `git checkout -b feature/your-feature`.

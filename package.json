@@ -1,5 +1,5 @@
 {
-  "name": "@cairoramos7/image-hues",
+  "name": "image-hues",
   "version": "1.0.3",
   "description": "Extract dominant colors and contrast colors from images",
   "main": "dist/index.js",
