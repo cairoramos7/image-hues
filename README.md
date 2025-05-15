@@ -23,10 +23,15 @@ Install the package via npm:
 
 ```bash
 npm install image-hues
+```
 
-Usage
-Basic Example
+## Usage
+
+### Basic Example
+
 Extract the dominant colors and contrast colors from an image URL:
+
+```javascript
 import { getImageDominantColors } from 'image-hues';
 
 getImageDominantColors('https://example.com/image.jpg')
@@ -39,9 +44,13 @@ getImageDominantColors('https://example.com/image.jpg')
     // }
   })
   .catch(error => console.error(error));
+```
 
-Custom Parameters
+### Custom Parameters
+
 Specify the sample size and number of colors:
+
+```javascript
 import { getImageDominantColors } from 'image-hues';
 
 getImageDominantColors('https://example.com/image.jpg', 5, 5)
@@ -50,9 +59,13 @@ getImageDominantColors('https://example.com/image.jpg', 5, 5)
     // Returns 5 dominant colors with a sample size of 5
   })
   .catch(error => console.error(error));
+```
 
-Advanced Usage
+### Advanced Usage
+
 Create a custom extractor instance for more control:
+
+```javascript
 import { createDominantColorExtractor } from 'image-hues';
 
 const extractor = createDominantColorExtractor();
@@ -61,54 +74,70 @@ extractor.extract('https://example.com/image.jpg', 10, 3)
     console.log(result);
   })
   .catch(error => console.error(error));
+```
 
-API
-getImageDominantColors(imageUrl: string, sampleSize?: number, colorCount?: number)
+## API
+
+### getImageDominantColors(imageUrl: string, sampleSize?: number, colorCount?: number)
+
 Extracts dominant colors and their contrast colors from an image.
-Parameters:
 
-imageUrl: The URL of the image (e.g., PNG, JPEG, SVG).
-sampleSize (optional, default: 10): Sampling rate for pixel analysis (higher values improve performance but may reduce accuracy).
-colorCount (optional, default: 3): Number of dominant colors to return.
+**Parameters:**
 
-Returns: A Promise resolving to an object with:
+- **imageUrl**: The URL of the image (e.g., PNG, JPEG, SVG).
+- **sampleSize** (optional, default: 10): Sampling rate for pixel analysis (higher values improve performance but may reduce accuracy).
+- **colorCount** (optional, default: 3): Number of dominant colors to return.
 
-mainColors: Array of hex color codes (e.g., ['#ff0000', '#00ff00']).
-contrastColors: Array of contrast colors (e.g., ['#ffffff', '#000000']).
+**Returns**: A Promise resolving to an object with:
 
-Throws: Errors for invalid images, failed loads, or canvas issues.
-createDominantColorExtractor(): ColorExtractor
+- **mainColors**: Array of hex color codes (e.g., ['#ff0000', '#00ff00']).
+- **contrastColors**: Array of contrast colors (e.g., ['#ffffff', '#000000']).
+
+**Throws**: Errors for invalid images, failed loads, or canvas issues.
+
+### createDominantColorExtractor(): ColorExtractor
+
 Creates a reusable ColorExtractor instance for custom processing.
-Returns: An object with an extract method matching getImageDominantColors.
-Requirements
 
-Modern browser environment (supports Image and Canvas APIs).
-ES2017+ for Object.entries (ensured via TypeScript configuration).
+**Returns**: An object with an extract method matching getImageDominantColors.
 
-Installation Notes
+## Requirements
 
-Ensure images are accessible with CORS (crossOrigin="Anonymous" is set).
-SVG support is limited to fallback colors due to canvas limitations.
+- Modern browser environment (supports Image and Canvas APIs).
+- ES2017+ for Object.entries (ensured via TypeScript configuration).
 
-Contributing
+## Installation Notes
+
+- Ensure images are accessible with CORS (crossOrigin="Anonymous" is set).
+- SVG support is limited to fallback colors due to canvas limitations.
+
+## Contributing
+
 Contributions are welcome! Follow these steps:
 
-Fork the repository: https://github.com/cairoramos7/image-hues.
-Create a feature branch: git checkout -b feature/your-feature.
-Commit changes: git commit -m "Add your feature".
-Push to the branch: git push origin feature/your-feature.
-Open a Pull Request.
+1. Fork the repository: https://github.com/cairoramos7/image-hues.
+2. Create a feature branch: `git checkout -b feature/your-feature`.
+3. Commit changes: `git commit -m "Add your feature"`.
+4. Push to the branch: `git push origin feature/your-feature`.
+5. Open a Pull Request.
 
 Please read CONTRIBUTING.md for details and code of conduct.
-Issues
-Report bugs or suggest features at GitHub Issues.
-License
+
+## Issues
+
+Report bugs or suggest features at [GitHub Issues](https://github.com/cairoramos7/image-hues/issues).
+
+## License
+
 This project is licensed under the MIT License. See LICENSE for details.
-Author
-Cairo Ramos @cairoramos7
-Acknowledgments
 
-Built with TypeScript for type safety and maintainability.
-Inspired by color extraction libraries like color-thief and vibrant.js.
+## Author
 
-Happy color extracting! 🎨```
+Cairo Ramos [@cairoramos7](https://github.com/cairoramos7)
+
+## Acknowledgments
+
+- Built with TypeScript for type safety and maintainability.
+- Inspired by color extraction libraries like color-thief and vibrant.js.
+
+Happy color extracting! 🎨
