@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>image-hues — extraia cores dominantes de qualquer imagem</title>
+<meta name="description" content="Biblioteca TypeScript para extrair cores dominantes e cores de contraste de imagens, 100% no navegador. Teste ao vivo, sem backend." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --color-primary: #1E293B;
+    --color-on-primary: #FFFFFF;
+    --color-accent: #22C55E;
+    --color-on-accent: #0F172A;
+    --color-background: #0F172A;
+    --color-foreground: #F8FAFC;
+    --color-card: #1B2336;
+    --color-card-foreground: #F8FAFC;
+    --color-muted: #272F42;
+    --color-muted-foreground: #94A3B8;
+    --color-border: #475569;
+    --color-destructive: #EF4444;
+    --color-ring: #FFFFFF;
+
+    --font-ui: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 32px;
+    --space-6: 48px;
+    --space-7: 64px;
+    --space-8: 96px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-ui);
+    line-height: 1.5;
+    font-size: 16px;
+  }
+
+  a { color: inherit; }
+
+  img { max-width: 100%; display: block; }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+  }
+
+  /* Nav */
+  .nav {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .nav-inner {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    min-height: 44px;
+  }
+
+  .brand .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 10px var(--color-accent);
+    flex: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+  }
+
+  .nav-links a {
+    color: var(--color-muted-foreground);
+    text-decoration: none;
+    font-size: 14px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    transition: color 200ms ease;
+  }
+
+  .nav-links a:hover { color: var(--color-foreground); }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: var(--space-7) var(--space-4) var(--space-6);
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--color-accent);
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    padding: 6px 12px;
+    border-radius: 999px;
+    margin-bottom: var(--space-4);
+  }
+
+  h1 {
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.15;
+    margin: 0 0 var(--space-3);
+    letter-spacing: -0.02em;
+  }
+
+  h1 .accent { color: var(--color-accent); }
+
+  .hero-sub {
+    color: var(--color-muted-foreground);
+    font-size: 18px;
+    max-width: 560px;
+    margin: 0 auto var(--space-5);
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-5);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+  }
+
+  .btn:active { transform: translateY(1px); }
+
+  .btn-primary {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .btn-primary:hover { background: #29d968; }
+
+  .btn-secondary {
+    background: transparent;
+    border-color: var(--color-border);
+    color: var(--color-foreground);
+  }
+
+  .btn-secondary:hover { border-color: var(--color-foreground); }
+
+  .install {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 10px 10px 10px 16px;
+    color: var(--color-card-foreground);
+  }
+
+  .install button {
+    font-family: var(--font-mono);
+    background: var(--color-muted);
+    border: 1px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    border-radius: 6px;
+    min-height: 32px;
+    min-width: 44px;
+    padding: 0 10px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+
+  .install button:hover { color: var(--color-foreground); border-color: var(--color-foreground); }
+
+  /* Demo section */
+  .demo-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: var(--space-5);
+    margin: 0 0 var(--space-7);
+  }
+
+  .demo-controls {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .field {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 13px;
+    color: var(--color-muted-foreground);
+  }
+
+  .field input {
+    width: 56px;
+    min-height: 36px;
+    background: var(--color-muted);
+    border: 1px solid var(--color-border);
+    color: var(--color-foreground);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+  }
+
+  .dropzone {
+    border: 2px dashed var(--color-border);
+    border-radius: 12px;
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+    cursor: pointer;
+    background: var(--color-primary);
+    transition: border-color 200ms ease, background 200ms ease;
+  }
+
+  .dropzone:hover,
+  .dropzone:focus-visible {
+    border-color: var(--color-accent);
+  }
+
+  .dropzone.dragover {
+    border-color: var(--color-accent);
+    background: rgba(34, 197, 94, 0.08);
+  }
+
+  .dropzone svg {
+    margin: 0 auto var(--space-3);
+    color: var(--color-muted-foreground);
+  }
+
+  .dropzone p {
+    margin: 0 0 var(--space-1);
+    font-weight: 600;
+  }
+
+  .dropzone .hint {
+    color: var(--color-muted-foreground);
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  .dropzone .browse {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  input[type="file"],
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .status {
+    text-align: center;
+    color: var(--color-muted-foreground);
+    min-height: 20px;
+    margin: var(--space-3) 0 0;
+    font-size: 14px;
+    font-family: var(--font-mono);
+  }
+
+  .status[data-state="error"] { color: var(--color-destructive); }
+  .status[data-state="success"] { color: var(--color-accent); }
+
+  .preview {
+    display: none;
+    margin-top: var(--space-5);
+  }
+
+  .preview.visible { display: block; }
+
+  .preview-image-wrap {
+    text-align: center;
+    margin-bottom: var(--space-4);
+  }
+
+  .preview img {
+    display: inline-block;
+    max-height: 280px;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+  }
+
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .swatch {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background: var(--color-primary);
+  }
+
+  .swatch .color {
+    height: 80px;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .swatch .meta {
+    padding: var(--space-2) var(--space-2);
+    font-size: 12px;
+    color: var(--color-muted-foreground);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .swatch .meta button {
+    background: none;
+    border: none;
+    color: var(--color-accent);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    padding: var(--space-1) var(--space-2);
+    min-height: 32px;
+  }
+
+  /* How it works */
+  .section-title {
+    font-size: 22px;
+    text-align: center;
+    margin: 0 0 var(--space-5);
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-7);
+  }
+
+  @media (max-width: 640px) {
+    .steps { grid-template-columns: 1fr; }
+    .demo-controls { gap: var(--space-3); }
+  }
+
+  .step {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: var(--space-4);
+  }
+
+  .step .num {
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    font-size: 13px;
+    margin-bottom: var(--space-2);
+  }
+
+  .step h3 {
+    margin: 0 0 var(--space-2);
+    font-size: 15px;
+  }
+
+  .step p {
+    margin: 0;
+    color: var(--color-muted-foreground);
+    font-size: 14px;
+  }
+
+  footer {
+    text-align: center;
+    padding: var(--space-6) var(--space-4) var(--space-7);
+    color: var(--color-muted-foreground);
+    font-size: 13px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  footer a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">
+      <span class="dot" aria-hidden="true"></span>
+      image-hues
+    </a>
+    <div class="nav-links">
+      <a href="https://github.com/cairoramos7/image-hues" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.npmjs.com/package/image-hues" target="_blank" rel="noopener">npm</a>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+  <div class="container">
+    <section class="hero">
+      <span class="eyebrow">Roda 100% no navegador · sem backend</span>
+      <h1>Extraia as cores <span class="accent">dominantes</span> de qualquer imagem</h1>
+      <p class="hero-sub">
+        Biblioteca TypeScript leve que analisa uma imagem via Canvas API e retorna as cores
+        dominantes e suas cores de contraste — sem enviar nada a um servidor. Teste abaixo.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#demo">Testar agora</a>
+        <a class="btn btn-secondary" href="https://github.com/cairoramos7/image-hues" target="_blank" rel="noopener">Ver código-fonte</a>
+      </div>
+      <div class="install">
+        <code>npm install image-hues</code>
+        <button type="button" id="copyInstall" aria-label="Copiar comando de instalação">copiar</button>
+      </div>
+    </section>
+
+    <section id="demo" class="demo-card" aria-labelledby="demo-title">
+      <h2 id="demo-title" class="section-title">Demo ao vivo</h2>
+
+      <div class="demo-controls">
+        <label class="field" for="colorCount">
+          Cores
+          <input type="number" id="colorCount" value="5" min="1" max="10" />
+        </label>
+        <label class="field" for="sampleSize">
+          Sample size
+          <input type="number" id="sampleSize" value="10" min="1" max="50" />
+        </label>
+      </div>
+
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-describedby="dropzone-hint">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M12 16V4m0 0L7 9m5-5l5 5" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <p>Arraste uma imagem aqui ou <span class="browse">clique para escolher</span></p>
+        <p class="hint" id="dropzone-hint">PNG, JPEG ou SVG — processado localmente</p>
+        <label class="visually-hidden" for="fileInput">Escolher arquivo de imagem</label>
+        <input type="file" id="fileInput" accept="image/*" />
+      </div>
+
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+
+      <div class="preview" id="preview">
+        <div class="preview-image-wrap">
+          <img id="previewImg" alt="Pré-visualização da imagem enviada" />
+        </div>
+        <div class="swatches" id="swatches"></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="how-title">
+      <h2 id="how-title" class="section-title">Como funciona</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="num">01</div>
+          <h3>Carrega a imagem</h3>
+          <p>A imagem é lida localmente e desenhada em um <code>&lt;canvas&gt;</code> oculto no navegador.</p>
+        </div>
+        <div class="step">
+          <div class="num">02</div>
+          <h3>Amostra os pixels</h3>
+          <p>Os pixels são amostrados e agrupados por cor para encontrar as tonalidades mais frequentes.</p>
+        </div>
+        <div class="step">
+          <div class="num">03</div>
+          <h3>Calcula o contraste</h3>
+          <p>Para cada cor dominante, calcula-se a luminância e retorna preto ou branco como contraste ideal.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Nenhuma imagem sai do seu navegador — todo o processamento acontece localmente via Canvas API.
+  <br />
+  <a href="https://github.com/cairoramos7/image-hues" target="_blank" rel="noopener">GitHub</a>
+  ·
+  <a href="https://www.npmjs.com/package/image-hues" target="_blank" rel="noopener">npm</a>
+  ·
+  <a href="https://github.com/cairoramos7/image-hues/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+</footer>
+
+<script type="module">
+  import { getImageDominantColors } from "https://esm.sh/image-hues@latest";
+
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("fileInput");
+  const statusEl = document.getElementById("status");
+  const preview = document.getElementById("preview");
+  const previewImg = document.getElementById("previewImg");
+  const swatchesEl = document.getElementById("swatches");
+  const colorCountInput = document.getElementById("colorCount");
+  const sampleSizeInput = document.getElementById("sampleSize");
+  const copyInstallBtn = document.getElementById("copyInstall");
+
+  let currentObjectUrl = null;
+
+  dropzone.addEventListener("click", () => fileInput.click());
+
+  dropzone.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      fileInput.click();
+    }
+  });
+
+  dropzone.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    dropzone.classList.add("dragover");
+  });
+
+  dropzone.addEventListener("dragleave", () => {
+    dropzone.classList.remove("dragover");
+  });
+
+  dropzone.addEventListener("drop", (event) => {
+    event.preventDefault();
+    dropzone.classList.remove("dragover");
+    const file = event.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (file) handleFile(file);
+  });
+
+  copyInstallBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText("npm install image-hues");
+      copyInstallBtn.textContent = "copiado!";
+      setTimeout(() => (copyInstallBtn.textContent = "copiar"), 1200);
+    } catch {
+      copyInstallBtn.textContent = "erro";
+    }
+  });
+
+  function setStatus(message, state = "") {
+    statusEl.textContent = message;
+    if (state) {
+      statusEl.setAttribute("data-state", state);
+    } else {
+      statusEl.removeAttribute("data-state");
+    }
+  }
+
+  async function handleFile(file) {
+    if (!file.type.startsWith("image/")) {
+      setStatus("Selecione um arquivo de imagem válido.", "error");
+      return;
+    }
+
+    if (currentObjectUrl) {
+      URL.revokeObjectURL(currentObjectUrl);
+    }
+    currentObjectUrl = URL.createObjectURL(file);
+
+    previewImg.src = currentObjectUrl;
+    preview.classList.add("visible");
+    swatchesEl.innerHTML = "";
+    setStatus("Extraindo cores...");
+
+    const colorCount = Math.max(1, Number(colorCountInput.value) || 5);
+    const sampleSize = Math.max(1, Number(sampleSizeInput.value) || 10);
+
+    try {
+      const result = await getImageDominantColors(currentObjectUrl, sampleSize, colorCount);
+      renderSwatches(result.mainColors, result.contrastColors);
+      setStatus(`${result.mainColors.length} cor(es) extraída(s).`, "success");
+    } catch (error) {
+      setStatus(`Erro ao extrair cores: ${error.message || error}`, "error");
+    }
+  }
+
+  function renderSwatches(mainColors, contrastColors) {
+    swatchesEl.innerHTML = "";
+    mainColors.forEach((hex, index) => {
+      const contrast = contrastColors[index];
+
+      const card = document.createElement("div");
+      card.className = "swatch";
+
+      const colorBlock = document.createElement("div");
+      colorBlock.className = "color";
+      colorBlock.style.background = hex;
+      colorBlock.style.color = contrast;
+      colorBlock.textContent = hex;
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+
+      const contrastLabel = document.createElement("span");
+      contrastLabel.textContent = `contraste ${contrast}`;
+
+      const copyButton = document.createElement("button");
+      copyButton.type = "button";
+      copyButton.textContent = "copiar";
+      copyButton.setAttribute("aria-label", `Copiar ${hex}`);
+      copyButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(hex);
+          copyButton.textContent = "copiado!";
+          setTimeout(() => (copyButton.textContent = "copiar"), 1200);
+        } catch {
+          copyButton.textContent = "erro";
+        }
+      });
+
+      meta.appendChild(contrastLabel);
+      meta.appendChild(copyButton);
+
+      card.appendChild(colorBlock);
+      card.appendChild(meta);
+      swatchesEl.appendChild(card);
+    });
+  }
+</script>
+</body>
+</html>
