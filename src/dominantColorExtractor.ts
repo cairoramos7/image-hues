@@ -71,9 +71,9 @@ class RasterImageProcessor implements ImageProcessor {
 
             if (a < 128) continue;
 
-            const quantizedR = Math.round(r / 10) * 10;
-            const quantizedG = Math.round(g / 10) * 10;
-            const quantizedB = Math.round(b / 10) * 10;
+            const quantizedR = Math.min(250, Math.round(r / 10) * 10);
+            const quantizedG = Math.min(250, Math.round(g / 10) * 10);
+            const quantizedB = Math.min(250, Math.round(b / 10) * 10);
             const hex = `#${((1 << 24) + (quantizedR << 16) + (quantizedG << 8) + quantizedB).toString(16).slice(1)}`;
             colorMap[hex] = (colorMap[hex] || 0) + 1;
         }
