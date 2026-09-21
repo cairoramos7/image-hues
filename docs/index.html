@@ -13,14 +13,15 @@
     --color-primary: #1E293B;
     --color-on-primary: #FFFFFF;
     --color-accent: #22C55E;
+    --color-accent-2: #38BDF8;
     --color-on-accent: #0F172A;
-    --color-background: #0F172A;
+    --color-background: #0B1220;
     --color-foreground: #F8FAFC;
-    --color-card: #1B2336;
+    --color-card: #131B2E;
     --color-card-foreground: #F8FAFC;
-    --color-muted: #272F42;
+    --color-muted: #1D2740;
     --color-muted-foreground: #94A3B8;
-    --color-border: #475569;
+    --color-border: #2B3855;
     --color-destructive: #EF4444;
     --color-ring: #FFFFFF;
 
@@ -48,6 +49,7 @@
     font-family: var(--font-ui);
     line-height: 1.5;
     font-size: 16px;
+    position: relative;
   }
 
   a { color: inherit; }
@@ -67,15 +69,67 @@
     }
   }
 
+  /* Ambient background glow */
+  .glow {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .glow::before,
+  .glow::after {
+    content: '';
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.22;
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+
+  .glow::before {
+    top: -180px;
+    left: -120px;
+    background: var(--color-accent);
+  }
+
+  .glow::after {
+    top: 120px;
+    right: -160px;
+    background: var(--color-accent-2);
+    animation-delay: -8s;
+  }
+
+  @keyframes drift {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(40px, 60px) scale(1.12); }
+  }
+
+  .bg-noise {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
   .container {
     max-width: 880px;
     margin: 0 auto;
     padding: 0 var(--space-4);
+    position: relative;
+    z-index: 1;
   }
 
   /* Nav */
   .nav {
     border-bottom: 1px solid var(--color-border);
+    position: relative;
+    z-index: 1;
   }
 
   .nav-inner {
@@ -110,7 +164,7 @@
 
   .nav-links {
     display: flex;
-    gap: var(--space-4);
+    gap: var(--space-3);
     align-items: center;
   }
 
@@ -119,12 +173,21 @@
     text-decoration: none;
     font-size: 14px;
     min-height: 44px;
+    min-width: 44px;
     display: flex;
     align-items: center;
-    transition: color 200ms ease;
+    gap: 6px;
+    padding: 0 8px;
+    border-radius: 8px;
+    transition: color 200ms ease, background 200ms ease;
   }
 
-  .nav-links a:hover { color: var(--color-foreground); }
+  .nav-links a:hover {
+    color: var(--color-foreground);
+    background: var(--color-muted);
+  }
+
+  .nav-links svg { flex: none; }
 
   /* Hero */
   .hero {
@@ -146,6 +209,21 @@
     margin-bottom: var(--space-4);
   }
 
+  .eyebrow .pulse {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
+    animation: pulse 2s ease-out infinite;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+    70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+  }
+
   h1 {
     font-size: clamp(32px, 5vw, 48px);
     line-height: 1.15;
@@ -153,13 +231,31 @@
     letter-spacing: -0.02em;
   }
 
-  h1 .accent { color: var(--color-accent); }
+  h1 .accent {
+    background: linear-gradient(90deg, var(--color-accent), var(--color-accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
   .hero-sub {
     color: var(--color-muted-foreground);
     font-size: 18px;
     max-width: 560px;
+    margin: 0 auto var(--space-4);
+  }
+
+  .hero-strip {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
     margin: 0 auto var(--space-5);
+  }
+
+  .hero-strip span {
+    width: 28px;
+    height: 10px;
+    border-radius: 4px;
   }
 
   .hero-actions {
@@ -190,6 +286,7 @@
   .btn-primary {
     background: var(--color-accent);
     color: var(--color-on-accent);
+    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4), 0 8px 24px -8px rgba(34, 197, 94, 0.5);
   }
 
   .btn-primary:hover { background: #29d968; }
@@ -202,20 +299,87 @@
 
   .btn-secondary:hover { border-color: var(--color-foreground); }
 
-  .install {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3);
-    font-family: var(--font-mono);
-    font-size: 14px;
+  /* Terminal-style install box */
+  .terminal {
+    max-width: 420px;
+    margin: 0 auto;
     background: var(--color-card);
     border: 1px solid var(--color-border);
-    border-radius: 8px;
-    padding: 10px 10px 10px 16px;
-    color: var(--color-card-foreground);
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: left;
+    box-shadow: 0 20px 40px -24px rgba(0, 0, 0, 0.6);
   }
 
-  .install button {
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 8px var(--space-3);
+    background: var(--color-primary);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .terminal-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .terminal-dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-border);
+  }
+
+  .terminal-tabs {
+    display: flex;
+    gap: 2px;
+    margin-left: auto;
+  }
+
+  .terminal-tabs button {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: none;
+    border: none;
+    color: var(--color-muted-foreground);
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    min-height: 28px;
+    transition: color 150ms ease, background 150ms ease;
+  }
+
+  .terminal-tabs button[aria-selected="true"] {
+    color: var(--color-on-accent);
+    background: var(--color-accent);
+  }
+
+  .terminal-tabs button:not([aria-selected="true"]):hover {
+    color: var(--color-foreground);
+    background: var(--color-muted);
+  }
+
+  .terminal-body {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+
+  .terminal-body code {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--color-accent);
+    flex: 1;
+  }
+
+  .terminal-body code .muted-prompt {
+    color: var(--color-muted-foreground);
+  }
+
+  .terminal-body button {
     font-family: var(--font-mono);
     background: var(--color-muted);
     border: 1px solid var(--color-border);
@@ -229,7 +393,7 @@
     transition: color 150ms ease, border-color 150ms ease;
   }
 
-  .install button:hover { color: var(--color-foreground); border-color: var(--color-foreground); }
+  .terminal-body button:hover { color: var(--color-foreground); border-color: var(--color-foreground); }
 
   /* Demo section */
   .demo-card {
@@ -238,6 +402,7 @@
     border-radius: 16px;
     padding: var(--space-5);
     margin: 0 0 var(--space-7);
+    position: relative;
   }
 
   .demo-controls {
@@ -352,7 +517,7 @@
 
   .swatches {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: var(--space-3);
   }
 
@@ -363,27 +528,70 @@
     background: var(--color-primary);
   }
 
-  .swatch .color {
-    height: 80px;
+  .swatch .main-color {
+    height: 88px;
     display: flex;
     align-items: flex-end;
     padding: var(--space-2);
     font-family: var(--font-mono);
     font-size: 13px;
     font-weight: 600;
+    position: relative;
   }
 
-  .swatch .meta {
-    padding: var(--space-2) var(--space-2);
-    font-size: 12px;
-    color: var(--color-muted-foreground);
+  .swatch .main-color .copy-main {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: inherit;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 3px 7px;
+    min-height: 28px;
+    cursor: pointer;
+  }
+
+  .swatch .contrast-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: var(--space-2);
+    padding: var(--space-2);
+    font-size: 12px;
+    color: var(--color-muted-foreground);
   }
 
-  .swatch .meta button {
+  .swatch .contrast-chip {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    flex: none;
+  }
+
+  .swatch .contrast-label {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+    flex: 1;
+  }
+
+  .swatch .contrast-label .tag {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-muted-foreground);
+  }
+
+  .swatch .contrast-label code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-foreground);
+  }
+
+  .swatch .copy-contrast {
     background: none;
     border: none;
     color: var(--color-accent);
@@ -394,37 +602,58 @@
     min-height: 32px;
   }
 
-  /* How it works */
+  /* How it works — connected timeline */
   .section-title {
     font-size: 22px;
     text-align: center;
     margin: 0 0 var(--space-5);
   }
 
-  .steps {
+  .timeline {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--space-4);
     margin-bottom: var(--space-7);
   }
 
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 22px;
+    left: calc(100% / 6);
+    right: calc(100% / 6);
+    height: 1px;
+    background: linear-gradient(90deg, var(--color-accent), var(--color-accent-2));
+    opacity: 0.35;
+  }
+
   @media (max-width: 640px) {
-    .steps { grid-template-columns: 1fr; }
+    .timeline { grid-template-columns: 1fr; }
+    .timeline::before { display: none; }
     .demo-controls { gap: var(--space-3); }
   }
 
   .step {
-    background: var(--color-card);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
-    padding: var(--space-4);
+    position: relative;
   }
 
   .step .num {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-family: var(--font-mono);
     color: var(--color-accent);
-    font-size: 13px;
-    margin-bottom: var(--space-2);
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 var(--space-3);
+    position: relative;
+    z-index: 1;
   }
 
   .step h3 {
@@ -444,6 +673,8 @@
     color: var(--color-muted-foreground);
     font-size: 13px;
     border-top: 1px solid var(--color-border);
+    position: relative;
+    z-index: 1;
   }
 
   footer a {
@@ -455,6 +686,9 @@
 </style>
 </head>
 <body>
+<div class="glow" aria-hidden="true"></div>
+<div class="bg-noise" aria-hidden="true"></div>
+
 <nav class="nav">
   <div class="nav-inner">
     <a class="brand" href="#top">
@@ -462,8 +696,19 @@
       image-hues
     </a>
     <div class="nav-links">
-      <a href="https://github.com/cairoramos7/image-hues" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://www.npmjs.com/package/image-hues" target="_blank" rel="noopener">npm</a>
+      <a href="https://github.com/cairoramos7/image-hues" target="_blank" rel="noopener" aria-label="Ver repositório no GitHub">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+        </svg>
+        GitHub
+      </a>
+      <a href="https://www.npmjs.com/package/image-hues" target="_blank" rel="noopener" aria-label="Ver pacote no npm">
+        <svg width="20" height="14" viewBox="0 0 24 24" role="img" aria-hidden="true">
+          <rect width="24" height="24" rx="3" fill="#CB3837" />
+          <path fill="#fff" d="M3 3h18v18H3zM6 6v12h4V9h3v9h4V6z" transform="scale(0.72) translate(4.6 4.6)" />
+        </svg>
+        npm
+      </a>
     </div>
   </div>
 </nav>
@@ -471,19 +716,39 @@
 <main id="top">
   <div class="container">
     <section class="hero">
-      <span class="eyebrow">Roda 100% no navegador · sem backend</span>
+      <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>Roda 100% no navegador · sem backend</span>
       <h1>Extraia as cores <span class="accent">dominantes</span> de qualquer imagem</h1>
       <p class="hero-sub">
         Biblioteca TypeScript leve que analisa uma imagem via Canvas API e retorna as cores
         dominantes e suas cores de contraste — sem enviar nada a um servidor. Teste abaixo.
       </p>
+      <div class="hero-strip" aria-hidden="true">
+        <span style="background:#fa3c3c"></span>
+        <span style="background:#f0c83c"></span>
+        <span style="background:#3cc878"></span>
+        <span style="background:#38BDF8"></span>
+        <span style="background:#a78bfa"></span>
+      </div>
       <div class="hero-actions">
         <a class="btn btn-primary" href="#demo">Testar agora</a>
         <a class="btn btn-secondary" href="https://github.com/cairoramos7/image-hues" target="_blank" rel="noopener">Ver código-fonte</a>
       </div>
-      <div class="install">
-        <code>npm install image-hues</code>
-        <button type="button" id="copyInstall" aria-label="Copiar comando de instalação">copiar</button>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="terminal-tabs" role="tablist" aria-label="Gerenciador de pacotes">
+            <button type="button" role="tab" aria-selected="true" data-manager="npm">npm</button>
+            <button type="button" role="tab" aria-selected="false" data-manager="yarn">yarn</button>
+            <button type="button" role="tab" aria-selected="false" data-manager="pnpm">pnpm</button>
+          </div>
+        </div>
+        <div class="terminal-body">
+          <code id="installCommand"><span class="muted-prompt">$</span> npm install image-hues</code>
+          <button type="button" id="copyInstall" aria-label="Copiar comando de instalação">copiar</button>
+        </div>
       </div>
     </section>
 
@@ -524,7 +789,7 @@
 
     <section aria-labelledby="how-title">
       <h2 id="how-title" class="section-title">Como funciona</h2>
-      <div class="steps">
+      <div class="timeline">
         <div class="step">
           <div class="num">01</div>
           <h3>Carrega a imagem</h3>
@@ -567,8 +832,29 @@
   const colorCountInput = document.getElementById("colorCount");
   const sampleSizeInput = document.getElementById("sampleSize");
   const copyInstallBtn = document.getElementById("copyInstall");
+  const installCommandEl = document.getElementById("installCommand");
+  const managerTabs = document.querySelectorAll(".terminal-tabs button");
 
   let currentObjectUrl = null;
+  let currentManager = "npm";
+
+  const installCommands = {
+    npm: "npm install image-hues",
+    yarn: "yarn add image-hues",
+    pnpm: "pnpm add image-hues",
+  };
+
+  function setManager(manager) {
+    currentManager = manager;
+    installCommandEl.innerHTML = `<span class="muted-prompt">$</span> ${installCommands[manager]}`;
+    managerTabs.forEach((tab) => {
+      tab.setAttribute("aria-selected", String(tab.dataset.manager === manager));
+    });
+  }
+
+  managerTabs.forEach((tab) => {
+    tab.addEventListener("click", () => setManager(tab.dataset.manager));
+  });
 
   dropzone.addEventListener("click", () => fileInput.click());
 
@@ -602,7 +888,7 @@
 
   copyInstallBtn.addEventListener("click", async () => {
     try {
-      await navigator.clipboard.writeText("npm install image-hues");
+      await navigator.clipboard.writeText(installCommands[currentManager]);
       copyInstallBtn.textContent = "copiado!";
       setTimeout(() => (copyInstallBtn.textContent = "copiar"), 1200);
     } catch {
@@ -647,6 +933,17 @@
     }
   }
 
+  async function copyHex(hex, button) {
+    try {
+      await navigator.clipboard.writeText(hex);
+      const original = button.textContent;
+      button.textContent = "copiado!";
+      setTimeout(() => (button.textContent = original), 1200);
+    } catch {
+      button.textContent = "erro";
+    }
+  }
+
   function renderSwatches(mainColors, contrastColors) {
     swatchesEl.innerHTML = "";
     mainColors.forEach((hex, index) => {
@@ -655,37 +952,53 @@
       const card = document.createElement("div");
       card.className = "swatch";
 
-      const colorBlock = document.createElement("div");
-      colorBlock.className = "color";
-      colorBlock.style.background = hex;
-      colorBlock.style.color = contrast;
-      colorBlock.textContent = hex;
+      const mainBlock = document.createElement("div");
+      mainBlock.className = "main-color";
+      mainBlock.style.background = hex;
+      mainBlock.style.color = contrast;
+      mainBlock.textContent = hex;
 
-      const meta = document.createElement("div");
-      meta.className = "meta";
-
-      const contrastLabel = document.createElement("span");
-      contrastLabel.textContent = `contraste ${contrast}`;
-
-      const copyButton = document.createElement("button");
-      copyButton.type = "button";
-      copyButton.textContent = "copiar";
-      copyButton.setAttribute("aria-label", `Copiar ${hex}`);
-      copyButton.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(hex);
-          copyButton.textContent = "copiado!";
-          setTimeout(() => (copyButton.textContent = "copiar"), 1200);
-        } catch {
-          copyButton.textContent = "erro";
-        }
+      const copyMainBtn = document.createElement("button");
+      copyMainBtn.type = "button";
+      copyMainBtn.className = "copy-main";
+      copyMainBtn.textContent = "copiar";
+      copyMainBtn.setAttribute("aria-label", `Copiar cor dominante ${hex}`);
+      copyMainBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        copyHex(hex, copyMainBtn);
       });
+      mainBlock.appendChild(copyMainBtn);
 
-      meta.appendChild(contrastLabel);
-      meta.appendChild(copyButton);
+      const contrastRow = document.createElement("div");
+      contrastRow.className = "contrast-row";
 
-      card.appendChild(colorBlock);
-      card.appendChild(meta);
+      const contrastChip = document.createElement("div");
+      contrastChip.className = "contrast-chip";
+      contrastChip.style.background = contrast;
+
+      const contrastLabel = document.createElement("div");
+      contrastLabel.className = "contrast-label";
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = "contraste";
+      const code = document.createElement("code");
+      code.textContent = contrast;
+      contrastLabel.appendChild(tag);
+      contrastLabel.appendChild(code);
+
+      const copyContrastBtn = document.createElement("button");
+      copyContrastBtn.type = "button";
+      copyContrastBtn.className = "copy-contrast";
+      copyContrastBtn.textContent = "copiar";
+      copyContrastBtn.setAttribute("aria-label", `Copiar cor de contraste ${contrast}`);
+      copyContrastBtn.addEventListener("click", () => copyHex(contrast, copyContrastBtn));
+
+      contrastRow.appendChild(contrastChip);
+      contrastRow.appendChild(contrastLabel);
+      contrastRow.appendChild(copyContrastBtn);
+
+      card.appendChild(mainBlock);
+      card.appendChild(contrastRow);
       swatchesEl.appendChild(card);
     });
   }
