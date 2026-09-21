@@ -1,10 +1,13 @@
 # Image Hues
 
 [![npm version](https://badge.fury.io/js/image-hues.svg)](https://www.npmjs.com/package/image-hues)
+[![Publish to npm](https://github.com/cairoramos7/image-hues/actions/workflows/publish.yml/badge.svg)](https://github.com/cairoramos7/image-hues/actions/workflows/publish.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub issues](https://img.shields.io/github/issues/cairoramos7/image-hues)](https://github.com/cairoramos7/image-hues/issues)
 
 **Image Hues** is a lightweight TypeScript library for extracting dominant colors and their contrast colors from images. It supports both raster images (e.g., PNG, JPEG) and SVG files, making it ideal for web developers building dynamic UI components, color palettes, or accessibility-focused designs.
+
+**[Try the live demo →](https://cairoramos7.github.io/image-hues/)** — upload an image and see the extracted colors right in your browser, no install required.
 
 **Note**: This package was previously published as `@cairoramos7/image-hues`. Use `image-hues` for new installations.
 
@@ -19,10 +22,18 @@
 
 ## Installation
 
-Install the package via npm:
+Install the package with your package manager of choice:
 
 ```bash
 npm install image-hues
+```
+
+```bash
+yarn add image-hues
+```
+
+```bash
+pnpm add image-hues
 ```
 
 ## Usage
