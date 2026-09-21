@@ -45,7 +45,7 @@ describe('Image Hues', () => {
     test('getImageDominantColors extracts dominant colors and contrast colors', async () => {
         const result = await getImageDominantColors('https://example.com/image.jpg', 2, 2);
         expect(result).toEqual({
-            mainColors: expect.arrayContaining(['#040000', '#000104']),
+            mainColors: expect.arrayContaining(['#fa0000', '#0000fa']),
             contrastColors: expect.arrayContaining(['#ffffff']),
         });
         expect(mockGetImageData).toHaveBeenCalled();
@@ -55,10 +55,26 @@ describe('Image Hues', () => {
         const extractor = createDominantColorExtractor();
         const result = await extractor.extract('https://example.com/image.jpg', 2, 2);
         expect(result).toEqual({
-            mainColors: expect.arrayContaining(['#040000', '#000104']),
+            mainColors: expect.arrayContaining(['#fa0000', '#0000fa']),
             contrastColors: expect.arrayContaining(['#ffffff']),
         });
         expect(mockGetImageData).toHaveBeenCalled();
+    }, 10000);
+
+    test('does not overflow hex composition for fully-saturated channels', async () => {
+        // Regression test for a quantization overflow: Math.round(255 / 10) * 10 === 260,
+        // which does not fit in 8 bits and bleeds into the adjacent channel during the
+        // hex bit-shift composition, corrupting the resulting color.
+        const result = await getImageDominantColors('https://example.com/image.jpg', 2, 2);
+        for (const hex of result.mainColors) {
+            expect(hex).toMatch(/^#[0-9a-f]{6}$/);
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            expect(r).toBeLessThanOrEqual(255);
+            expect(g).toBeLessThanOrEqual(255);
+            expect(b).toBeLessThanOrEqual(255);
+        }
     }, 10000);
 
     test('handles SVG images with fallback colors', async () => {
